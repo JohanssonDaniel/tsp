@@ -13,8 +13,8 @@
 class Tour {
 public:
 
-    Tour();
-    void TourConstructor(Point p, Point p1, Point p2, Point p3);
+    Tour(Point p, Point p1, Point p2, Point p3);
+    //void tourConstructor();
     ~Tour();
     void show();
     void draw(QGraphicsScene* scene);

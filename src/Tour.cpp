@@ -9,14 +9,8 @@
 #include "Node.h"
 #include "Point.h"
 
-Tour::Tour()
+Tour::Tour(Point a, Point b, Point c, Point d)
 {
-    // TODO: write this member
-}
-
-void Tour::TourConstructor(Point a, Point b, Point c, Point d)
-{
-
     m_front = new Node(a,new Node(b, new Node(c, new Node(d, nullptr))));
     m_front->next->next->next->next = m_front;
 }
@@ -27,8 +21,14 @@ Tour::~Tour()
 }
 
 void Tour::show()
-{
-    // TODO: write this member
+{   if(m_front != nullptr){
+        Node* current = m_front;
+        while(current->next != m_front){
+            cout << current->toString() << endl;
+            current = current->next;
+        }
+        cout << current->toString() << endl;
+    }
 }
 
 void Tour::draw(QGraphicsScene *scene)
