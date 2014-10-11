@@ -120,7 +120,28 @@ void Tour::insertNearest(Point p)
 
 void Tour::insertSmallest(Point p)
 {
-    // TODO: write this member
+    double increasedDistance = -1;
+    for(int i = 0; i < size(); ++i){
+
+        Tour tempTour = this;
+        Node* tempCurrent = tempTour.m_front;
+
+        for(int j; j < i; ++j){
+            tempCurrent = tempCurrent->next;
+        }
+
+        Node* temp = tempCurrent->next;
+        tempCurrent->next = new Node(p, temp);
+        double tempIncreasedDistance = tempTour.distance();
+
+        if(increasedDistance = -1){
+            increasedDistance = tempIncreasedDistance;
+        }
+        else if(tempIncreasedDistance < increasedDistance){
+            increasedDistance = tempIncreasedDistance;
+            this = tempTour;
+        }
+    }
 }
 
 void Tour::insert(int index, Point point){
