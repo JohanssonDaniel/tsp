@@ -37,29 +37,39 @@ int main(int argc, char *argv[]) {
     view->show();
 
     // run insertion heuristic
-    Point p(0,0);
-    Point p1(0,1);
-    Point p2(1,0);
-    Point p3(1,1);
-    //Tour tour;
+    /*Point p(100,100);
+    Point p1(500,100);
+    Point p2(500,500);
+    Point p3(100,500);*/
+    Tour tour;
 
 
-    Tour tour(p, p1, p2, p3);
+    /*Tour tour(p, p1, p2, p3);
     tour.show();
+    cout << tour.size() << endl;
+    cout << "Distance: " << tour.distance() << endl;*/
 
     double x;
     double y;
-    /*while (input >> x >> y) {
+    while (input >> x >> y) {
         Point p(x, y);
         tour.insertNearest(p);
         //uncomment the 4 lines below to animate
         //tour.draw(scene);
-        //std::chrono::milliseconds dura(50);
+        //std::chrono::milliseconds dura(500);
         //std::this_thread::sleep_for(dura);
         //a.processEvents();
-    }
-    input.close();*/
-
+    }/*
+    input.close();
+    Point p(110, 225);
+    Point p1(161, 280);
+    Point p2(157, 443);
+    Point p3(283, 379);
+    tour.insertNearest(p);
+    tour.insertNearest(p1);
+    tour.insertNearest(p2);
+    tour.insertNearest(p3);
+*/
     // print tour to standard output
     cout << "Tour distance: " << std::fixed << std::setprecision(4)
          << std::showpoint << tour.distance() << endl;

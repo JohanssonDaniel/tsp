@@ -13,8 +13,8 @@
 class Tour {
 public:
 
-    Tour(Point p, Point p1, Point p2, Point p3);
-    //void tourConstructor();
+    Tour();
+    void Tour2(Point p, Point p1, Point p2, Point p3);
     ~Tour();
     void show();
     void draw(QGraphicsScene* scene);
@@ -24,6 +24,7 @@ public:
     void insertSmallest(Point p);
 
 private:
+    void insert(int index, Point point);
     Node* m_front = nullptr;   // pointer to front node in Tourlist;  nullptr if empty
 };
 
