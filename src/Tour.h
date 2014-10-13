@@ -25,6 +25,7 @@ public:
 
 private:
     void insert(int index, Point point);
+    void deleteTempNode(int index);
     Node* m_front = nullptr;   // pointer to front node in Tourlist;  nullptr if empty
 };
 

@@ -41,6 +41,7 @@ void Tour::show()
 
 void Tour::draw(QGraphicsScene *scene)
 {   bool hasNotLooped = true;
+    int tourSize = size();
     if(m_front != nullptr){
         Node* current = m_front;
         while (hasNotLooped && current->next != nullptr){
@@ -75,7 +76,7 @@ double Tour::distance()
     bool hasNotLooped = true;
     if(m_front != nullptr){
         Node* current = m_front;
-        while(hasNotLooped){
+        while(hasNotLooped && current->next != nullptr){
             tourDistance += current->point.distanceTo(current->next->point);
 
             current = current->next;
@@ -99,6 +100,7 @@ void Tour::insertNearest(Point p)
     else{
         Node* current = m_front;
         while(hasNotLooped && current != nullptr){
+
             double tempNearestDistance = p.distanceTo(current->point);
             index++;
             if(nearestDistance == -1){
@@ -121,26 +123,34 @@ void Tour::insertNearest(Point p)
 void Tour::insertSmallest(Point p)
 {
     double increasedDistance = -1;
-    for(int i = 0; i < size(); ++i){
+    int shortestDistanceIndex = 1;
+    int index = 1;
+    bool hasNotLooped = true;
 
-        Tour tempTour = this;
-        Node* tempCurrent = tempTour.m_front;
-
-        for(int j; j < i; ++j){
-            tempCurrent = tempCurrent->next;
+    if (m_front == nullptr){
+        m_front = new Node(p, m_front);
+    }
+    else{
+        Node* current = m_front;
+        while(hasNotLooped && current != nullptr && current->next != nullptr && index <= size()){
+            insert(index, p);
+            double tempIncreasedDistance = distance();
+            if(increasedDistance == -1){
+                increasedDistance = tempIncreasedDistance;
+                shortestDistanceIndex = index;
+            }
+            else if(tempIncreasedDistance < increasedDistance){
+                increasedDistance = tempIncreasedDistance;
+                shortestDistanceIndex = index;
+            }
+            current = current->next;
+            if(current == m_front){
+                hasNotLooped = false;
+            }
+            deleteTempNode(index);
+            ++index;
         }
-
-        Node* temp = tempCurrent->next;
-        tempCurrent->next = new Node(p, temp);
-        double tempIncreasedDistance = tempTour.distance();
-
-        if(increasedDistance = -1){
-            increasedDistance = tempIncreasedDistance;
-        }
-        else if(tempIncreasedDistance < increasedDistance){
-            increasedDistance = tempIncreasedDistance;
-            this = tempTour;
-        }
+        insert(shortestDistanceIndex, p);
     }
 }
 
@@ -154,7 +164,7 @@ void Tour::insert(int index, Point point){
         for (int i = 0; i < index - 1; i++) {
             current = current->next;
         }
-        if(index > size()-1){
+         if(index > size()-1){
             current->next = new Node(point, m_front);
         }
         else{
@@ -162,4 +172,21 @@ void Tour::insert(int index, Point point){
             current->next = new Node(point, temp);
         }
     }
+}
+
+void Tour::deleteTempNode(int index){
+    Node* trash;
+    if (index == 0){
+        trash = m_front;
+        m_front = m_front->next;
+    }
+    else{
+        Node* current = m_front;
+        for (int i = 0; i < index-1; ++i){
+            current = current->next;
+        }
+        trash = current->next;
+        current->next = current->next->next;
+    }
+    delete trash;
 }
