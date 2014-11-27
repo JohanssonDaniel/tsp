@@ -1,8 +1,11 @@
-// This is the .cpp file you will edit and turn in.
-// We have provided a skeleton for you,
-// but you must finish it as described in the spec.
-// Also remove these comments here and add your own.
-// TODO: remove this comment header
+/*
+ * Tour.cpp implements the Tour class behavior declared in Tour.h
+ * Borrows the insert(), delete() and clear() functions from the 9:th lecture code
+ *
+ * danjo732, piehe154
+ * The task was to implement the functions and their behavior, specified in the lab instruction
+ * Is mainly focusing on adding Points to the Tour according to the Nearest neighbour or Smallest increase heuristic
+ */
 
 #include <iostream>
 #include "Tour.h"
@@ -15,178 +18,159 @@ Tour::Tour()
 
 Tour::~Tour()
 {
-    // TODO: write this member
+    clear();
 }
-
-
-void Tour::Tour2(Point a, Point b, Point c, Point d)
-{
-    m_front = new Node(a,new Node(b, new Node(c, new Node(d, nullptr))));
-    m_front->next->next->next->next = m_front;
+/*
+ * Clears the Tour by getting the next Node and deleting it.
+ * Loops until it has reached the front
+ */
+void Tour::clear() {
+    Node* current = m_front;
+    if(m_front != nullptr){
+        do{
+            Node* temp = current;
+            current = current->next;
+            delete temp;
+        }
+        while(current != m_front);
+    }
+    m_front = nullptr;
 }
-
+/* Prints out each Nodes Point to the console by looping through the list and calling the Points ->toString() method
+ * Stops looping when current == m_front.
+ */
 void Tour::show()
-{   bool hasNotLooped = true;
+{
     if(m_front != nullptr){
         Node* current = m_front;
-        while(hasNotLooped && current->next != nullptr){
+        do{
             cout << current->toString() << endl;
             current = current->next;
-            if(current == m_front){
-                hasNotLooped = false;
-            }
-        }
+        }while(current != m_front);
     }
 }
-
-void Tour::draw(QGraphicsScene *scene)
-{   bool hasNotLooped = true;
-    int tourSize = size();
+/* Draws line between the current and current->next point by calling the point.drawTo() method.
+ * Stops looping when current == m_front.
+ */
+void Tour::draw(QGraphicsScene *scene){
     if(m_front != nullptr){
         Node* current = m_front;
-        while (hasNotLooped && current->next != nullptr){
+        do{
             current->point.drawTo(current->next->point, scene);
             current = current->next;
-            if(current == m_front){
-                hasNotLooped = false;
-            }
-        }
+        }while(current != m_front);
     }
 }
-
+/* Returns the size of the Tour.
+ * Loops through the list and increasing the index until current == m_front.
+ */
 int Tour::size()
 {   int tourSize = 0;
-    bool hasNotLooped = true;
     if(m_front != nullptr){
         Node* current = m_front;
-        while (hasNotLooped && current->next != nullptr) {
+        do{
+
             tourSize++;
             current = current->next;
-            if(current == m_front){
-                hasNotLooped = false;
-            }
-        }
+        }while (current != m_front);
     }
     return tourSize;
 }
-
+/* Returns the total distance between all the line between the points of the list
+ * by calling the distanceTo method and adding that distance to tourDistance.
+ * Stops looping when current == m_front.
+ */
 double Tour::distance()
 {
     double tourDistance = 0;
-    bool hasNotLooped = true;
     if(m_front != nullptr){
         Node* current = m_front;
-        while(hasNotLooped && current->next != nullptr){
+        do{
+
             tourDistance += current->point.distanceTo(current->next->point);
 
             current = current->next;
-            if(current == m_front){
-                hasNotLooped = false;
-            }
-        }
+        }while(current != m_front);
+        return tourDistance;
     }
-    return tourDistance;
 }
 
+/* Inserts a given point into the Tour according to the "Nearest neighbour" heuristic.
+ * Tries the distance between the given point and all the points in the Tour and saves the index of the
+ * Point which has the closest distance to the new Point.
+ * Calls the insert() function to add the new Point at the saved index.
+ * Usage: tour.insertNearest(p);
+ */
 void Tour::insertNearest(Point p)
 {
     double nearestDistance = -1;
-    int index = 0;
-    int closestIndex = 0;
-    bool hasNotLooped = true;
-    if(m_front == nullptr){
-        m_front = new Node(p, m_front);
+    Node* smallestNode = m_front;
+    if(m_front == nullptr){                 //If this is the first Node
+        m_front = new Node(p, m_front);     //Create a new Node which points to itself and has the Point p as element
     }
     else{
-        Node* current = m_front;
-        while(hasNotLooped && current != nullptr){
+        Node* current = m_front;            //Initialize current as the first Node of the list
+        do{
+            double tempNearestDistance = p.distanceTo(current->point); //Save the distance between the current and new point
+            if(nearestDistance == -1 || tempNearestDistance < nearestDistance){ //Check whether we have updated nearest distance or we have a smaller distance
+                nearestDistance = tempNearestDistance;
+                smallestNode = current;
+            }
 
-            double tempNearestDistance = p.distanceTo(current->point);
-            index++;
-            if(nearestDistance == -1){
-                closestIndex = index;
-                nearestDistance = tempNearestDistance;
-            }
-            else if(tempNearestDistance < nearestDistance){
-                closestIndex = index;
-                nearestDistance = tempNearestDistance;
-            }
-            current = current->next;
-            if(current == m_front){
-                hasNotLooped = false;
-            }
-        }
-        insert(closestIndex, p);
+            current = current->next;                                            //Point to next Node
+        }while(current != m_front);
+        insertAfter(smallestNode, p);
     }
 }
-
+/* Inserts a given point into the Tour according to the "Smallest increase" heuristic.
+ * Inserts the given point with the insert() function, into the Tour and calls the distance() function to check the total distance of the tour.
+ * Saves the index where the increase is the smallest and calls the insert() function to add the Point as a Node to the Tour.
+ * Usage: tour.insertSmallest(p);
+ */
 void Tour::insertSmallest(Point p)
 {
     double increasedDistance = -1;
-    int shortestDistanceIndex = 1;
-    int index = 1;
-    bool hasNotLooped = true;
+    Node* smallestNode = m_front;
 
-    if (m_front == nullptr){
-        m_front = new Node(p, m_front);
+    if (m_front == nullptr){                //If this is the first Node
+        m_front = new Node(p, m_front);     //Create a new Node which points to itself and has the Point p as element
     }
     else{
-        Node* current = m_front;
-        while(hasNotLooped && current != nullptr && current->next != nullptr && index <= size()){
-            insert(index, p);
-            double tempIncreasedDistance = distance();
-            if(increasedDistance == -1){
-                increasedDistance = tempIncreasedDistance;
-                shortestDistanceIndex = index;
+        Node* current = m_front;            //Initialize current as the first Node of the list
+        do{
+
+            insertAfter(current, p);
+            double tempIncreasedDistance = distance();                      //Save the new total distance
+
+            if(increasedDistance == -1 ||tempIncreasedDistance < increasedDistance){ //Check whether we have updated smallest total distance or we have a smaller total distance
+                increasedDistance = tempIncreasedDistance;                           //Update increasedDistance
+                smallestNode = current;
             }
-            else if(tempIncreasedDistance < increasedDistance){
-                increasedDistance = tempIncreasedDistance;
-                shortestDistanceIndex = index;
-            }
+            deleteAfterNode(current);
+
             current = current->next;
-            if(current == m_front){
-                hasNotLooped = false;
-            }
-            deleteTempNode(index);
-            ++index;
-        }
-        insert(shortestDistanceIndex, p);
+        }while(current != m_front);
+
+        insertAfter(smallestNode, p);
     }
 }
 
-void Tour::insert(int index, Point point){
-    if (index == 0) {
-        Node* temp = m_front;
-        m_front = new Node(point, temp);
-    }
-    else {
-        Node* current = m_front;
-        for (int i = 0; i < index - 1; i++) {
-            current = current->next;
-        }
-         if(index > size()-1){
-            current->next = new Node(point, m_front);
-        }
-        else{
-            Node* temp = current->next;
-            current->next = new Node(point, temp);
-        }
-    }
-}
+/*
+ * Insert the specified point after the node by setting the nodes next pointer to point at the a new node with the point as value and
+ * The previous node next->next pointer as next pointer
+ */
+void Tour::insertAfter(Node* node, Point point){
 
-void Tour::deleteTempNode(int index){
-    Node* trash;
-    if (index == 0){
-        trash = m_front;
-        m_front = m_front->next;
+    if(node->next == nullptr){
+        node->next = new Node(point, m_front);
     }
     else{
-        Node* current = m_front;
-        for (int i = 0; i < index-1; ++i){
-            current = current->next;
-        }
-        trash = current->next;
-        current->next = current->next->next;
+        node->next = new Node(point, node->next);
     }
-    delete trash;
+
 }
+
+void Tour::deleteAfterNode(Node *node){
+    node->next = node->next->next;
+}
+
