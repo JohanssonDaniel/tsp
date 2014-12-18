@@ -45,6 +45,8 @@ public:
      */
     void insertSmallest(Point p);
 
+    void edgeLocalExchangeSearch();
+
 private:
     /* Used to insert a new Node with a specified point at the index.
      */

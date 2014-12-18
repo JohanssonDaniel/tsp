@@ -18,7 +18,7 @@
 int main(int argc, char *argv[]) {
     QApplication a(argc, argv);
 
-    string filename = "tsp10.txt";
+    string filename = "tsp85900.txt";
     ifstream input;
     input.open(filename);
 
@@ -43,7 +43,7 @@ int main(int argc, char *argv[]) {
     double y;
     while (input >> x >> y) {
         Point p(x, y);
-        tour.insertSmallest(p);
+        tour.insertNearest(p);
         //uncomment the 4 lines below to animate
         //tour.draw(scene);
         //std::chrono::milliseconds dura(500);
@@ -56,8 +56,17 @@ int main(int argc, char *argv[]) {
     cout << "Tour distance: " << std::fixed << std::setprecision(4)
          << std::showpoint << tour.distance() << endl;
     cout << "Number of points: " << tour.size() << endl;
-    tour.show();
+    //tour.show();
 
+    tour.edgeLocalExchangeSearch();
+
+
+
+    // print tour to standard output
+    cout << "Tour distance(improved): " << std::fixed << std::setprecision(4)
+         << std::showpoint << tour.distance() << endl;
+    cout << "Number of points: " << tour.size() << endl;
+    //tour.show();
     // draw tour
     tour.draw(scene);
     return a.exec(); // start Qt event loop

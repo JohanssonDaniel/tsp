@@ -107,6 +107,7 @@ void Tour::insertNearest(Point p)
     Node* smallestNode = m_front;
     if(m_front == nullptr){                 //If this is the first Node
         m_front = new Node(p, m_front);     //Create a new Node which points to itself and has the Point p as element
+        m_front->next = m_front;
     }
     else{
         Node* current = m_front;            //Initialize current as the first Node of the list
@@ -155,6 +156,29 @@ void Tour::insertSmallest(Point p)
     }
 }
 
+void Tour::edgeLocalExchangeSearch(){
+    Node* current = m_front;
+    double dist = distance();
+    do{
+        Node* current2 = current->next;
+        Node* current3 = current2->next;
+        Node* current4 = current3->next;
+
+        //Efter byten 1-3-2-4
+        current->next = current3;
+        current3->next = current2;
+        current2->next = current4;
+
+        if(distance() > dist){
+            //Byt tillbaka till 1-2-3-4
+            current->next = current2;
+            current2->next = current3;
+            current3->next = current4;
+        }
+        //Välj nästa nod
+        current = current->next;
+    }while(current != m_front);
+}
 /*
  * Insert the specified point after the node by setting the nodes next pointer to point at the a new node with the point as value and
  * The previous node next->next pointer as next pointer
